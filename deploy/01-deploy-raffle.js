@@ -1,4 +1,4 @@
-const {network} = require("hardhat")
+const {network, ethers} = require("hardhat")
 const {verfiy} = require("../utils/verify")
 const {developmentChains, networkConfig, VERIFICATION_BLOCK_CONFIRMATIONS} = require("../helper-hardhat-config")
 
@@ -27,9 +27,10 @@ module.exports = async ({getNamedAccounts, deployments}) => {
         networkConfig[chainId]["raffleEntranceFee"],
         networkConfig[chainId]["callbackGasLimit"],
     ]
-    const raffle = deploy("Raffle", {
+    const raffle = await deploy("Raffle", {
         from: deployer,
         args: args,
+        log: true,
         waitConfirmations: waitBlockConfirmations,
     })
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
