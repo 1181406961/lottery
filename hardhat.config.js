@@ -10,6 +10,7 @@ const GOERLI_RPC_URL =
     process.env.GOERLI_RPC_URL || ""
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ""
+const REPORT_GAS = process.env.REPORT_GAS || false
 
 module.exports = {
     solidity: {
@@ -51,5 +52,12 @@ module.exports = {
     },
     mocha:{
         timeout: 500000,
-    }
+    },
+    gasReporter: {
+        enabled: REPORT_GAS,
+        currency: "USD",
+        outputFile: "gas-report.txt",
+        noColors: true,
+        // coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    },
 };

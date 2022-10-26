@@ -8,7 +8,7 @@ module.exports = async ({getNamedAccounts, deployments}) => {
     const {deployer} = await getNamedAccounts()
     const chainId = network.config.chainId
     const waitBlockConfirmations = developmentChains.includes(network.name) ? 1 : VERIFICATION_BLOCK_CONFIRMATIONS
-    let vrfCoordinatorV2Address, subscriptionId;
+    let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2Mock;
     if (developmentChains.includes(network.name)) {
         vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock");
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address;
@@ -20,22 +20,28 @@ module.exports = async ({getNamedAccounts, deployments}) => {
         vrfCoordinatorV2Address = networkConfig[chainId]['vrfCoordinatorV2'];
         subscriptionId = networkConfig[chainId]['subscriptionId'];
     }
-    args = [vrfCoordinatorV2Address,
+    let arguments = [
+        vrfCoordinatorV2Address,
         subscriptionId,
         networkConfig[chainId]["gasLane"],
         networkConfig[chainId]["keepersUpdateInterval"],
         networkConfig[chainId]["raffleEntranceFee"],
         networkConfig[chainId]["callbackGasLimit"],
-    ]
+    ];
     const raffle = await deploy("Raffle", {
         from: deployer,
-        args: args,
+        args: arguments,
         log: true,
         waitConfirmations: waitBlockConfirmations,
     })
+    // consumer必须注册
+    if (developmentChains.includes(network.name)) {
+        let trxResponse = await vrfCoordinatorV2Mock.addConsumer(subscriptionId, raffle.address);
+        await trxResponse.wait();
+    }
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...");
-        await verfiy(raffle.address, args)
+        await verfiy(raffle.address, arguments)
     }
     log("lottery deployed!")
     log("----------------------------------------------------")
