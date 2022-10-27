@@ -1,5 +1,5 @@
 const {network, ethers} = require("hardhat")
-const {verfiy} = require("../utils/verify")
+const {verify} = require("../utils/verify")
 const {developmentChains, networkConfig, VERIFICATION_BLOCK_CONFIRMATIONS} = require("../helper-hardhat-config")
 
 const FUND_AMOUNT = ethers.utils.parseEther("1") // 1 Ether, or 1e18 (10^18) Wei
@@ -41,7 +41,7 @@ module.exports = async ({getNamedAccounts, deployments}) => {
     }
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...");
-        await verfiy(raffle.address, arguments)
+        await verify(raffle.address, arguments)
     }
     log("lottery deployed!")
     log("----------------------------------------------------")

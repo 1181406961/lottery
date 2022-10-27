@@ -40,6 +40,7 @@ module.exports = {
     etherscan: {
         apiKey: {
             goerli: ETHERSCAN_API_KEY,
+            timeout: 500000,
         }
     },
     namedAccounts :{
